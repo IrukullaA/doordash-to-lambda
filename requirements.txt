@@ -1,6 +1,3 @@
 pandas
 boto3
-io
-datetime
-os
 python-dotenv
