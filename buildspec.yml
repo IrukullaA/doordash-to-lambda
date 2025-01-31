@@ -1,0 +1,23 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.12
+    commands:
+      - echo "Installing dependecies..."
+      - pip install -r requirements.txt -t lib
+  build:
+    commands:
+      - echo "Zipping deployment package..."
+      - cd lib
+      - zip -r9 ../doordash_deployment_package.zip .
+      - cd ..
+      - zip -g doordash_deployment_package.zip lambda_function.py
+      - zip -g doordash_deployment_package.zip .env
+  post_build:
+    commands:
+      - echo "Uploading to s3..."
+      - aws s3 cp doordash_deployment_package.zip s3://aws-lambda-builds-zip/
+      - echo "Updating Lambda fucntion via s3..."
+      - aws lambda update-function-code --function-name doordash-assign3 --s3-bucket aws-lambda-builds-zip --s3-key doordash_deployment_package.zip
+      - echo "Deployment complete!!!"
